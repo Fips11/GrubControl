@@ -1,1 +1,68 @@
 
+#!/bin/sh
+cat <<EOF
+if [ -f  \${config_directory}/custom.cfg ]; then
+  source \${config_directory}/custom.cfg
+elif [ -z "\${config_directory}" -a -f  \$prefix/custom.cfg ]; then
+  source \$prefix/custom.cfg;
+fi
+
+
+
+##################################################################
+# boot_var 	
+#			0 = start menu without nativedisk  (fallback if default dont load complete ... com error to usb serial) 
+#			1 = start windows at once  (no nativedisk modul) and set boot_var to 2 (default)
+#			2 = (default) start menu with nativedisk
+#			3 = start linux at once
+
+
+#if [ "\$boot_var" = 0 ]; then
+
+
+if [ "\$boot_var" = 1 ]; then				# boot fast windows 
+	set boot_var=0							#TODO später auf 2 ändern
+	save_env boot_var
+	
+	set default=4
+	set timeout=0
+fi
+
+########
+
+											#TODO: edit 30_os-prober to set boot_var=1, save_env boot_var and reboot   if boot_vat is set to 2 and de windows bootentry is selected
+
+if [ "\$boot_var" = 2 ]; then
+
+	set boot_var=0							#set to rescueboot if usb fails
+	save_env boot_var
+
+
+	nativedisk
+
+	terminal_output --append serial_usb0
+	
+	terminal_input --append serial_usb0
+	
+	GRUB_TERMINAL="console serial_usb0"
+
+	###die kommen später vom controller
+	set boot_var=2
+	save_env boot_var
+
+fi
+
+
+if [ "\$boot_var" = 3 ]; then				# boot fast linux 
+
+	set boot_var=2
+	save_env boot_var
+
+	set default=1
+	set timeout=0
+
+fi
+##################################################################
+
+EOF
+
