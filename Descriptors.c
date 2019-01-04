@@ -144,7 +144,7 @@ const USB_Descriptor_String_t PROGMEM ManufacturerString = USB_STRING_DESCRIPTOR
  *  and is read out upon request by the host when the appropriate string ID is requested, listed in the Device
  *  Descriptor.
  */
-const USB_Descriptor_String_t PROGMEM ProductString = USB_STRING_DESCRIPTOR(L"FT232R USB UART"); //oder  QEMU USB SERIAL  ;-P
+const USB_Descriptor_String_t PROGMEM ProductString = USB_STRING_DESCRIPTOR(L"FT232R USB UART"); // QEMU USB SERIAL 
 
 const USB_Descriptor_String_t PROGMEM SerialString = USB_STRING_DESCRIPTOR(L"A900gas9");
 /** This function is called by the library when in device mode, and must be overridden (see library "USB Descriptors"
