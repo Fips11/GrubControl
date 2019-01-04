@@ -438,7 +438,7 @@ void EVENT_USB_Device_ControlRequest(void)
 											
 			break;
 
-			case    FTDI_SIO_SET_DATA: /*4 Set the data characteristics of the port */
+			case    FTDI_SIO_SET_DATA: /*4 Set the data characteristics of the port */ 
 					
 				Endpoint_ClearSETUP();
 				
