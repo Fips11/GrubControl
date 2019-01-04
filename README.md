@@ -10,6 +10,6 @@ Many integrated webcams or SD card readers are connected via USB, their connecti
 Hints: 
 - only works with GRUB 2
 - Booting Windows is a little hacky
-- a Grub.d script must be modified
+- the Grub.d script 41_custom must be modified
 - in some laptops the webcam is supplied with 3.3v (the operation at 3.3 volts usually requires a 
 lower clock frequency of 8mhz. This was not considered in the firmware yet ) 
