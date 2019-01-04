@@ -9,7 +9,19 @@ Many integrated webcams or SD card readers are connected via USB, their connecti
 
 Hints: 
 - only works with GRUB 2
-- Booting Windows is a little hacky
+- Booting Windows is a little bit hacky
 - the Grub.d script 41_custom must be modified
 - in some laptops the webcam is supplied with 3.3v (the operation at 3.3 volts usually requires a 
 lower clock frequency of 8mhz. This was not considered in the firmware yet ) 
+
+- The current program size is currently: Program Memory Usage 	:	5284 bytes   16,1 % 
+				                                 Data Memory Usage 		:	301 bytes   11,8 % 
+
+
+
+TODO:
+- Support for more than one device descriptor (for HID mode)
+- 8 mhz support
+- capacitive buttons
+- bugfix in the detection of Android
+- a better evaluation of the grub output
