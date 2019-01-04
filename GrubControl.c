@@ -72,11 +72,10 @@ boot_var's
 
 */
 
-
 //---------------------------- boot windows - Commands to Host-------------------------------------------------
 uint8_t win_size = 2;
-const char win_comm_1[] PROGMEM = "c\r set boot_var=1 \r save_env boot_var \r clear \r reboot \r"; // starte windows  
-const char win_comm_2[] PROGMEM = "";
+const char win_comm_1[] PROGMEM = "c\r";  
+const char win_comm_2[] PROGMEM = "set boot_var=1 \r save_env boot_var \r clear \r reboot \r"; // starte windows 
 
 PGM_P const win_mess_table[] PROGMEM = 
 {
@@ -86,8 +85,8 @@ PGM_P const win_mess_table[] PROGMEM =
 
 //---------------------------- boot linux - Commands to Host-------------------------------------------------
 uint8_t lin_size = 2;
-const char lin_comm_1[] PROGMEM = "c\r set boot_var=3 \r save_env boot_var \r clear \r reboot \r"; // starte linux  
-const char lin_comm_2[] PROGMEM = "   ";
+const char lin_comm_1[] PROGMEM = "c\r";  
+const char lin_comm_2[] PROGMEM = "set boot_var=3 \r save_env boot_var \r clear \r reboot \r";  // starte linux 
 
 PGM_P const lin_mess_table[] PROGMEM =
 {
@@ -95,11 +94,11 @@ PGM_P const lin_mess_table[] PROGMEM =
 	,lin_comm_2
 };
 
-//---------------------------- boot secret encrypted system - Commands to Host-------------------------------------------------
-uint8_t se_size = 2;
+//---------------------------- boot no entry Linux - Commands to Host-------------------------------------------------
+uint8_t se_size = 3;
 const char se_comm_1[] PROGMEM = "c\r"; // 
-const char se_comm_2[] PROGMEM = ""; // 
-const char se_comm_3[] PROGMEM = ""; //
+const char se_comm_2[] PROGMEM = "linux (hd0,gpt2)/pup/vmlinuz root=/dev/sda2/pup psubdir=/pup/ \r"; //    start puppylinux		das (hd0,gpt2) muss wahrscheinlich noch angepasst werden weil ja dann kein efi mehr l√§uft
+const char se_comm_3[] PROGMEM = "initrd (hd0,gpt2)/pup/initrd.gz \r boot\r"; //
 
 PGM_P const se_mess_table[] PROGMEM =
 {
@@ -109,13 +108,14 @@ PGM_P const se_mess_table[] PROGMEM =
 	
 };
 
+
 //--------------------------------STATE------------------------------------------------
 
 uint8_t  latency = 0;	// lateny value of the ftdi driver
 
 int8_t os_message_counter = -1; // welche os startmessage schon gesedet wurde 
 
-uint8_t state = 0;	//(0 << 0)| //time to send // wird vom timer1 gesetzt und lˆst meldung an den host aus
+uint8_t state = 0;	//(0 << 0)| //time to send // wird vom timer1 gesetzt und l√∂st meldung an den host aus
 					//(0 << 1)| //select windows  
 					//(0 << 2)| //select linux 
 					//(0 << 3)|	//os identify bit
@@ -175,7 +175,7 @@ int main(void)
 
 	for (;;)
 	{
-		// TODO: buttonabfragen durch interrupt ersetzen ? ‰ndert sich ja sp‰ter eh durch wahl des eingabemediums
+		// TODO: buttonabfragen durch interrupt ersetzen ? √§ndert sich ja sp√§ter eh durch wahl des eingabemediums
 		
 		if(PINB & (1 << 6) ) {												// if pin D10 is high
 			state |= (1 << 1);												//if only... select windows to boot 
@@ -194,7 +194,7 @@ int main(void)
 			 state &= ~(1 << 0 );											// reset timetosendflag	
 		}
 		
-		if(state & ( 1 << 5 )){												// f¸lle USBDeviceToHost_Buffer mit befehlen , sobald klar ist das der host sie verarbeiten kann 
+		if(state & ( 1 << 5 )){												// f√ºlle USBDeviceToHost_Buffer mit befehlen , sobald klar ist das der host sie verarbeiten kann 
 			 		
 			startOS();
 		}
@@ -405,7 +405,7 @@ void EVENT_USB_Device_ControlRequest(void)
 				if (divisor == 0 && subdivisor8 == 0)
 				divisor = 1;
 				
-				/* diese beiden zeile stellen den uart auf die vom host geforderte baudrate. interessant f¸r den bridgemode*/						 
+				/* diese beiden zeile stellen den uart auf die vom host geforderte baudrate. interessant f√ºr den bridgemode*/						 
 				//Serial_Disable();	
 				//Serial_Init((48000000 / 2) / (8 * divisor + subdivisor8), true);
 						
@@ -525,13 +525,14 @@ void EVENT_USB_Device_ControlRequest(void)
 			
 				Endpoint_ClearSETUP();
 						
-				//wIndex wird bei jeder anfrage um 1 erhˆht
+				//wIndex wird bei jeder anfrage um 1 erh√∂ht
 				
 				Endpoint_Write_16_BE(pgm_read_word(&(FTDI_eeprom[USB_ControlRequest.wIndex])));
 						
 				Endpoint_ClearIN();
  
-				Endpoint_ClearStatusStage();
+				Endpoint_ClearStatusStage();
+
 			break;
 					
 		}
@@ -739,7 +740,7 @@ uint8_t Device_SendByte(const uint8_t Data)
 void setSendFlag(void)
 {
 	
-	state |= (1 << 0);															//setzt statebit f¸r timetosend im state
+	state |= (1 << 0);															//setzt statebit f√ºr timetosend im state
 	
 }
 
@@ -779,7 +780,7 @@ void sendHostOutBufferToUsart(void)												// Load the next byte from the Ho
 
 void processFromHost(void)
 {																				//wenn noch nicht festgestellt wurde ob grub Eingaben entgegen nehmen kann
-																				//suche nach zeichen die nur grub men¸output sein kˆnnen
+																				//suche nach zeichen die nur grub men√ºoutput sein k√∂nnen
 	if(!(state & ( 1 << 5 )))
 	{
 		
@@ -789,7 +790,7 @@ void processFromHost(void)
 	else
 	{
 		
-		while(RingBuffer_GetCount(&USBHostToDevice_Buffer))						// lˆsche gesamten ringbuffer
+		while(RingBuffer_GetCount(&USBHostToDevice_Buffer))						// l√∂sche gesamten ringbuffer
 		{
 			RingBuffer_Remove(&USBHostToDevice_Buffer);
 		}
@@ -806,29 +807,29 @@ void searchInitGrub(void){
 	int y = 0;
 	uint8_t count = RingBuffer_GetCount(&USBHostToDevice_Buffer);
 	
-	for(int i = 0 ; i<count ; i++)												// wiederhole f¸r jedes im buffer vorhandene zeichen
+	for(int i = 0 ; i<count ; i++)												// wiederhole f√ºr jedes im buffer vorhandene zeichen
 	{
 		buffer = RingBuffer_Remove(&USBHostToDevice_Buffer);
 		buffer2 = pgm_read_word(&(grub_init_string[y]));
 		buffer3 = pgm_read_word(&(grub_init_string[0]));													
 																				//grub_init_string == 47 4E 55 20 47 52 55 42 //GNU GRUB
 		
-		if(buffer2 == buffer)													//pt¸fe ob  byte im buffer zum gesuchten string passt 
+		if(buffer2 == buffer)													//pt√ºfe ob  byte im buffer zum gesuchten string passt 
 		{   
 		
 			RingBuffer_Insert(&USBHostToDevice_Buffer, buffer);
-			y++;																//wenn ja erhˆhe um 1 um zu schauen ob die n‰chsten bytes auch passen 
+			y++;																//wenn ja erh√∂he um 1 um zu schauen ob die n√§chsten bytes auch passen 
 		}
 		else
 		{
 			if(buffer3 == buffer)
 			{	
 				RingBuffer_Insert(&USBHostToDevice_Buffer, buffer);
-				y = 1;															// wenn ¸bereinstimmung mit erstem byte 
+				y = 1;															// wenn √ºbereinstimmung mit erstem byte 
 			}
 			else
 			{
-				y = 0;															// setze index von suchstringarray wieder auf null wenn keine ¸bereinstimmung
+				y = 0;															// setze index von suchstringarray wieder auf null wenn keine √ºbereinstimmung
 			}
 																					
 		}
@@ -836,7 +837,7 @@ void searchInitGrub(void){
 								
 		if(y>7)																	//wenn der gesammte string drin vorkommt 
 		{
-			state |= (1 << 5);													// set searchInitGrubBit to 1  -- das heist wir wissen wir sind definitiv in grub sind und empfangen die men¸seite also kˆnnen wir nun anfangen befehle zu senden
+			state |= (1 << 5);													// set searchInitGrubBit to 1  -- das heist wir wissen wir sind definitiv in grub sind und empfangen die men√ºseite also k√∂nnen wir nun anfangen befehle zu senden
 			
 			break;		
 		}
@@ -844,10 +845,10 @@ void searchInitGrub(void){
 	}
 	
 	if(y == 0 || y>7)															// y<7 = sequenz gefunden  y==0 = keine bytes mit richtiger reihenfolge im buffer 
-																				// alles von 1-6 hieﬂt es kˆnnten die letzten bytes passen und der rest folgt im n‰chsten paket
+																				// alles von 1-6 hie√üt es k√∂nnten die letzten bytes passen und der rest folgt im n√§chsten paket
 	{
 		
-		while(RingBuffer_GetCount(&USBHostToDevice_Buffer))						// lˆsche gesamten ringbuffer
+		while(RingBuffer_GetCount(&USBHostToDevice_Buffer))						// l√∂sche gesamten ringbuffer
 		{
 			RingBuffer_Remove(&USBHostToDevice_Buffer);
 		}
@@ -867,13 +868,13 @@ void startOS(void){
 	
 	if(!RingBuffer_IsEmpty(&USBDeviceToHost_Buffer))return;
 	
-	if(os_message_counter == 0)return;	// wenn os_message_counter ==0 m¸ssten alle zeilen gesendet worden sein und wir kˆnnen abbrechen
+	if(os_message_counter == 0)return;	// wenn os_message_counter ==0 m√ºssten alle zeilen gesendet worden sein und wir k√∂nnen abbrechen
 	
 		// eigendlich !(state & ( 1 << 3 )) && !(state & ( 1 << 4 )) aber osSelect funktioniert nicht richtig
 	if( !(state & ( 1 << 3 ))  ) // wenn grub als system erkannt wurde
 	{	 
 	  
-		if(!(state & ( 1 << 1 )) && !(state & ( 1 << 2 )) ) return; // wenn kein os gew‰hlt mache nichts
+		if(!(state & ( 1 << 1 )) && !(state & ( 1 << 2 )) ) return; // wenn kein os gew√§hlt mache nichts
 		
 		uint16_t pointer0 = 0;
 		uint8_t size = 0;
@@ -883,7 +884,7 @@ void startOS(void){
 		{
 			
 			pointer0 = (int) &(win_mess_table[0]) ;
-			size = win_size;	//anzahl der arrayeint‰ge
+			size = win_size;	//anzahl der arrayeint√§ge
 			
 		}
 		
@@ -891,7 +892,7 @@ void startOS(void){
 		{
 			
 			pointer0 = (int) &(lin_mess_table[0]) ;
-			size = lin_size;	//anzahl der arrayeint‰ge 
+			size = lin_size;	//anzahl der arrayeint√§ge 
 			
 		}
 		
@@ -899,23 +900,23 @@ void startOS(void){
 		{
 			
 			pointer0 = (int) &(se_mess_table[0]) ;
-			size = se_size;	//anzahl der arrayeint‰ge
+			size = se_size;	//anzahl der arrayeint√§ge
 			
 		}
 		
 		// wenn os_message_counter ==  -1 (initzustand) setze ihn auf anzahl der zeilen
-		if(os_message_counter < 0) os_message_counter = size; // wenn messagez‰hler noch nicht gesetzt. setze ihn
+		if(os_message_counter < 0) os_message_counter = size; // wenn messagez√§hler noch nicht gesetzt. setze ihn
 		
 
 		//pointer = (PGM_P)pgm_read_word( &(pointer[size - os_message_counter]) );
-		PGM_P pointer = (PGM_P)pgm_read_word( pointer0+((size - os_message_counter)*2) ); //*2 weil pointer 16bit = 2 byte // f¸r n‰chste pointeradresse muss man immer 2 byte weiter springen
+		PGM_P pointer = (PGM_P)pgm_read_word( pointer0+((size - os_message_counter)*2) ); //*2 weil pointer 16bit = 2 byte // f√ºr n√§chste pointeradresse muss man immer 2 byte weiter springen
 
 		//RingBuffer_Insert(&debugUSART_Buffer, os_message_counter); //0x01
 		
 		
 		uint8_t buffer = 0;
 		
-		for(;;pointer++){	//¸bertrage jedes byte des chararrays (zb win_comm_1) auf das der pointer zeigt bis der nullterminator erreicht ist 
+		for(;;pointer++){	//√ºbertrage jedes byte des chararrays (zb win_comm_1) auf das der pointer zeigt bis der nullterminator erreicht ist 
 			 
 			 buffer = pgm_read_byte( pointer );
 			 
