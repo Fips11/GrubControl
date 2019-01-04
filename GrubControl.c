@@ -97,15 +97,16 @@ PGM_P const lin_mess_table[] PROGMEM =
 //---------------------------- boot no entry Linux - Commands to Host-------------------------------------------------
 uint8_t se_size = 3;
 const char se_comm_1[] PROGMEM = "c\r"; // 
-const char se_comm_2[] PROGMEM = "linux (hd0,gpt2)/pup/vmlinuz root=/dev/sda2/pup psubdir=/pup/ \r"; //    start puppylinux		das (hd0,gpt2) muss wahrscheinlich noch angepasst werden weil ja dann kein efi mehr läuft
+const char se_comm_2[] PROGMEM = "linux (hd0,gpt2)/pup/vmlinuz root=/dev/sda2/pup psubdir=/pup/ \r";    
+												 	//(hd0,gpt2) muss wahrscheinlich noch angepasst werden weil ja dann kein efi mehr läuft
 const char se_comm_3[] PROGMEM = "initrd (hd0,gpt2)/pup/initrd.gz \r boot\r"; //
 
 PGM_P const se_mess_table[] PROGMEM =
 {
 	 se_comm_1
 	,se_comm_2
-	,se_comm_3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
-	
+	,se_comm_3   
+		 
 };
 
 
