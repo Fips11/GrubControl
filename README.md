@@ -7,3 +7,9 @@ The firmware is able to recognize the currently running operating system in orde
 Most laptops have internal USB interfaces to connect the atmega32u4.
 Many integrated webcams or SD card readers are connected via USB, their connections can be used for example.
 
+Hints: 
+- only works with GRUB 2
+- Booting Windows is a little hacky
+- a Grub.d script must be modified
+- in some laptops the webcam is supplied with 3.3v (the operation at 3.3 volts usually requires a 
+lower clock frequency of 8mhz. This was not considered in the firmware yet ) 
